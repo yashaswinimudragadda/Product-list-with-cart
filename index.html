@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+  <title>Dessert Shop | Product List with Cart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&display=swap');
+
+
+    :root {
+ /* 1. CSS Variables from Style Guide */
+ 
+
+ --red: hsl(14, 86%, 42%);
+  --green: hsl(159, 69%, 38%);
+  
+  --rose-50: hsl(20, 50%, 98%);
+  --rose-100: hsl(13, 31%, 94%);
+  --rose-300: hsl(14, 25%, 72%);
+  --rose-400: hsl(7, 20%, 60%);
+  --rose-500: hsl(12, 20%, 44%);
+  --rose-900: hsl(14, 65%, 9%);
+
+  /* Typography */
+  --font-family: 'Red Hat Text', sans-serif;
+  --fw-normal: 400;
+  --fw-semi-bold: 600;
+  --fw-bold: 700;
+
+  /* Fluid Typography using clamp() */
+  /* Title: Min 2rem (32px) -> Max 3.5rem (56px) */
+  --fs-xl: clamp(2rem, 5vw + 1rem, 3.5rem);
+  /* Cart Title: Min 1.25rem -> Max 1.5rem */
+  --fs-lg: clamp(1.25rem, 2vw + 0.5rem, 1.5rem);
+  /* Base size for product names */
+  --fs-base: 1rem; 
+}
+
+/* 2. Global Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--rose-50);
+  color: var(--rose-900);
+  font-family: var(--font-family);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  /* Fluid padding for different screen widths */
+  padding: clamp(1.5rem, 5vw, 4rem); 
+}
+
+
+
+
+
+
+
+.attribution {
+  /* Spacing */
+  padding: 2rem 1rem;
+  margin-top: 3rem;
+  
+  /* Typography */
+  font-size: 0.6875rem; /* 11px */
+  text-align: center;
+  color: var(--rose-500); /* hsl(12, 20%, 44%) */
+  
+  /* Layout: Ensures it stays below the main container */
+  width: 100%;
+}
+
+.attribution a {
+  color: var(--red); /* hsl(14, 86%, 42%) */
+  text-decoration: none;
+  font-weight: var(--fw-semi-bold); /* 600 */
+  transition: color 0.3s ease;
+}
+
+.attribution a:hover {
+  text-decoration: underline;
+  color: hsl(14, 86%, 32%); /* Slightly darker red on hover */
+}
+
+
+.main-title h1{
+  font-size:4rem;
+  font-weight: 900;
+}
+/* 3. Layout */
+.container {
+  max-width: 1215px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .container {
+    /* 1440px Desktop layout */
+    grid-template-columns: 1fr 380px; 
+    align-items: start;
+  }
+}
+
+/* 4. Product Cards Grid */
+.desserts-column {
+  flex: 1;
+}
+
+.main-title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  margin-bottom: 2rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem 1.5rem;
+}
+
+/* 5. Individual Card Styling */
+.image-container {
+  position: relative;
+  /* Space for the absolute-positioned button */
+  margin-bottom: 2.5rem; 
+}
+
+.card .product-img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.card.selected .product-img {
+  border-color: var(--red);
+}
+
+.card .category {
+  color: var(--rose-500);
+  font-size: 0.875rem;
+}
+
+.card .name {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semi-bold);
+  color: var(--rose-900);
+  margin: 0.25rem 0;
+}
+
+.card .price {
+  color: var(--red);
+  font-weight: var(--fw-semi-bold);
+}
+
+/* 6. Buttons & Interactive Elements */
+.add-to-cart-btn {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  background: #fff;
+  border: 1px solid var(--rose-400);
+  color: var(--rose-900);
+  font-weight: var(--fw-semi-bold);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 160px;
+  transition: all 0.2s ease;
+}
+
+.add-to-cart-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.quantity-stepper {
+  /* Positioning: Centers the button on the bottom edge of the image */
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  
+  /* Layout & Sizing */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: clamp(150px, 12vw, 160px);
+  height: 44px;
+  padding: 0 12px;
+  
+  /* Visuals from Style Guide */
+  background-color: var(--red); /* hsl(14, 86%, 42%) */
+  color: #fff;
+  border-radius: 999px;
+  z-index: 10;
+}
+
+.quantity-stepper span {
+  font-weight: var(--fw-bold); /* 700 */
+  font-size: var(--fs-base); /* 16px */
+  user-select: none;
+}
+
+.quantity-stepper button {
+  /* Reset button styles */
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  
+  /* Sizing */
+  width: 20px;
+  height: 20px;
+  
+  /* Center the SVG icons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Hover State: Inverts colors for better UX */
+.quantity-stepper button:hover {
+  background-color: #fff;
+}
+
+/* Logic to change SVG color to Red on hover using filters */
+.quantity-stepper button:hover img {
+  filter: brightness(0) saturate(100%) invert(34%) sepia(91%) saturate(1915%) hue-rotate(345deg) brightness(88%) contrast(97%);
+}
+
+.quantity-stepper button:active {
+  transform: scale(0.9);
+}
+
+
+
+
+.remove-btn {
+  /* Layout: Circular shape and centering the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  
+  /* Reset default button styles */
+  background: transparent;
+  border: 1px solid var(--rose-400); /* hsl(7, 20%, 60%) */
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  
+  /* Smooth transition for hover effects */
+  transition: all 0.2s ease;
+}
+
+.remove-btn img {
+  /* Ensure the "x" icon is sized correctly */
+  width: 10px;
+  height: 10px;
+  /* Prevent icon distortion */
+  object-fit: contain;
+}
+
+/* Hover State */
+.remove-btn:hover {
+  /* Change border to the darker rose color on hover */
+  border-color: var(--rose-900); /* hsl(14, 65%, 9%) */
+}
+
+.remove-btn:hover img {
+  /* Use filter to turn the icon dark/black on hover */
+  filter: brightness(0);
+}
+
+/* Active State for tactile feedback */
+.remove-btn:active {
+  transform: scale(0.9);
+}
+
+/* 7. Cart Sidebar */
+.cart-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.cart-title {
+  display: flex;
+  align-items: center; /* Ensures text and number stay perfectly leveled */
+  gap: 2px;            /* Modern way to add space between "Your Cart" and the count */
+  
+  /* Typography from your Style Guide */
+  color: var(--red);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  
+  /* Spacing */
+  margin-bottom: 1.5rem;
+}
+
+/* --- Individual Cart Item Container --- */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rose-100); /* hsl(13, 31%, 94%) */
+}
+
+/* --- Left Side: Item Information --- */
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-name {
+  font-size: 0.875rem;
+  font-weight: var(--fw-semi-bold); /* 600 */
+  color: var(--rose-900); /* hsl(14, 65%, 9%) */
+}
+
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between qty, unit price, and total */
+}
+
+/* --- Price & Quantity Typography --- */
+.qty {
+  font-size: 0.875rem;
+  font-weight: var(--fw-semi-bold); /* 600 */
+  color: var(--red); /* hsl(14, 86%, 42%) */
+  margin-right: 4px;
+}
+
+.unit-price {
+  font-size: 0.875rem;
+  color: var(--rose-500); /* hsl(12, 20%, 44%) */
+}
+
+.total-item-price {
+  font-size: 0.875rem;
+  font-weight: var(--fw-semi-bold); /* 600 */
+  color: var(--rose-500);
+  margin-left: 4px;
+}
+/* --- Cart Bottom Section --- */
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.order-total span:first-child {
+  font-size: 0.875rem;
+  color: var(--rose-900);
+}
+
+.total-amount {
+  /* Fluid font size for the price: Min 24px -> Max 32px */
+  font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+  font-weight: var(--fw-bold); /* 700 */
+  color: var(--rose-900);
+}
+
+.carbon-neutral {
+  /* Layout: Centers the icon and text horizontally */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  /* Visuals: Subtle background and rounded corners */
+  background-color: var(--rose-50); /* hsl(20, 50%, 98%) */
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.carbon-neutral img {
+  /* Use a consistent size from your design */
+  width: 20px;
+  height: 20px;
+  
+  /* Prevent the icon from shrinking if text wraps on small screens */
+  flex-shrink: 0;
+  
+  /* Ensure the icon doesn't stretch or distort */
+  object-fit: contain;
+  
+  /* Optional: align with text baseline if it looks slightly off-center */
+  vertical-align: middle;
+  border-radius:50% ;
+  background-color: var(--red);
+}
+
+.carbon-neutral span {
+  /* Base text styling */
+  font-size: 0.875rem;
+  color: var(--rose-900); /* hsl(14, 65%, 9%) */
+}
+
+.carbon-neutral b {
+  /* Emphasized text using semi-bold weight */
+  font-weight: var(--fw-semi-bold); /* 600 */
+  color: var(--rose-900);
+}
+
+.confirm-btn {
+  width: 100%;
+  background-color: var(--red); /* hsl(14, 86%, 42%) */
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 1rem;
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: var(--fw-semi-bold);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* Hover & Active States */
+.confirm-btn:hover {
+  /* Slightly darker red for hover effect */
+  background-color: hsl(14, 86%, 32%);
+}
+
+.confirm-btn:active {
+  transform: scale(0.98);
+}
+
+
+
+
+
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end; /* Mobile: slides from bottom */
+  justify-content: center;
+  z-index: 1000;
+}
+
+@media (min-width: 768px) {
+  .modal-overlay { align-items: center; } /* Desktop: centered */
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 590px;
+  border-radius: 12px 12px 0 0;
+}
+
+@media (min-width: 768px) {
+  .modal-content { border-radius: 12px; }
+}
+
+.modal-icon { width: 48px; margin-bottom: 1.5rem; }
+
+.modal-content h1 { font-size: 2.5rem; line-height: 1.2; margin-bottom: 0.5rem; }
+.modal-subtitle { color: var(--rose-500); margin-bottom: 2rem; }
+
+.modal-order-summary {
+  background: var(--rose-50);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rose-100);
+}
+
+.modal-item-left { display: flex; gap: 1rem; align-items: center; }
+.modal-item-left img { width: 48px; border-radius: 4px; }
+.modal-item-info .name { font-weight: 600; font-size: 0.875rem; margin-bottom: 4px; }
+.modal-item-info .qty { color: var(--red); font-weight: 600; margin-right: 8px; }
+.modal-item-info .price { color: var(--rose-500); }
+.item-total { font-weight: 600; color: var(--rose-900); }
+
+.modal-total-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+}
+
+.modal-total-container .total-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--rose-900);
+}
+
+.hidden { display: none !important; }
+
+  </style>
+</head>
+<body>
+
+  <main class="container">
+    <section class="desserts-column">
+      <h1 class="main-title"><strong>Desserts</strong></h1>
+      <div class="product-grid" id="product-grid">
+        </div>
+    </section>
+
+    <aside class="cart-column">
+      <div class="cart-card" id="cart-container">
+        <h2 class="cart-title">Your Cart (0)</h2>
+        
+        <div class="cart-empty-state">
+          <img src="./assets/images/illustration-empty-cart.svg" alt="Empty Cart Illustration">
+          <p>Your added items will appear here</p>
+        </div>
+
+        </div>
+    </aside>
+  </main>
+
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-content">
+    <img src="./assets/images/icon-order-confirmed.svg" alt="Confirmed" class="modal-icon">
+    <h1>Order Confirmed</h1>
+    <p class="modal-subtitle">We hope you enjoy your food!</p>
+
+    <div class="modal-order-summary">
+      <div id="modal-items-list">
+        </div>
+      <div class="modal-total-container">
+        <span>Order Total</span>
+        <span id="modal-total-price" class="total-price"></span>
+      </div>
+    </div>
+
+    <button class="confirm-btn" onclick="resetGame()">Start New Order</button>
+  </div>
+</div>
+
+  <footer class="attribution">
+    <a href="/index.html" >back to home page</a>. 
+    Coded by <a href="#">Yashaswini Mudragadda</a>.
+  </footer>
+
+  <script>
+    // --- State Management ---
+let productsData = [];
+let cart = [];
+
+const productGrid = document.getElementById('product-grid');
+const cartContainer = document.getElementById('cart-container');
+
+// --- 1. Fetch & Initialize ---
+async function initApp() {
+    try {
+        const response = await fetch('./data.json');
+        productsData = await response.json();
+        renderProducts();
+        updateCartUI();
+    } catch (error) {
+        console.error("Error loading products:", error);
+    }
+}
+
+// --- 2. Render Product Cards ---
+function renderProducts() {
+    productGrid.innerHTML = productsData.map(product => {
+        const cartItem = cart.find(item => item.name === product.name);
+        const isInCart = !!cartItem;
+
+        return `
+            <div class="card ${isInCart ? 'selected' : ''}">
+                <div class="image-container">
+                    <img src="${product.image.desktop}" alt="${product.name}" class="product-img">
+                    
+                    ${isInCart ? `
+                        <div class="quantity-stepper">
+                            <button onclick="changeQuantity('${product.name}', -1)">
+                                <img src="./assets/images/icon-decrement-quantity.svg" alt="minus">
+                            </button>
+                            <span>${cartItem.quantity}</span>
+                            <button onclick="changeQuantity('${product.name}', 1)">
+                                <img src="./assets/images/icon-increment-quantity.svg" alt="plus">
+                            </button>
+                        </div>
+                    ` : `
+                        <button class="add-to-cart-btn" onclick="addToCart('${product.name}')">
+                            <img src="./assets/images/icon-add-to-cart.svg" alt=""> Add to Cart
+                        </button>
+                    `}
+                </div>
+                <div class="info">
+                    <p class="category">${product.category}</p>
+                    <h2 class="name">${product.name}</h2>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// --- 3. Cart Logic ---
+window.addToCart = (name) => {
+    const product = productsData.find(p => p.name === name);
+    cart.push({ ...product, quantity: 1 });
+    renderProducts();
+    updateCartUI();
+};
+
+window.changeQuantity = (name, delta) => {
+    const itemIndex = cart.findIndex(item => item.name === name);
+    if (itemIndex !== -1) {
+        cart[itemIndex].quantity += delta;
+        
+        // Remove item if quantity drops to 0
+        if (cart[itemIndex].quantity <= 0) {
+            cart.splice(itemIndex, 1);
+        }
+    }
+    renderProducts();
+    updateCartUI();
+};
+
+window.removeItem = (name) => {
+    cart = cart.filter(item => item.name !== name);
+    renderProducts();
+    updateCartUI();
+};
+
+// --- 4. Update Cart UI ---
+function updateCartUI() {
+    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+    const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    if (cart.length === 0) {
+        cartContainer.innerHTML = `
+            <h2 class="cart-title">Your Cart (0)</h2>
+            <div class="cart-empty-state">
+                <img src="./assets/images/illustration-empty-cart.svg" alt="Empty Cart">
+                <p>Your added items will appear here</p>
+            </div>
+        `;
+        return;
+    }
+
+    cartContainer.innerHTML = `
+        <h2 class="cart-title">Your Cart (${totalItems})</h2>
+        <div class="cart-items-list">
+            ${cart.map(item => `
+                <div class="cart-item">
+                    <div class="item-details">
+                        <p class="item-name">${item.name}</p>
+                        <p class="item-meta">
+                            <span class="qty">${item.quantity}x</span> 
+                            <span class="unit-price">@ $${item.price.toFixed(2)}</span> 
+                            <span class="total-item-price">$${(item.quantity * item.price).toFixed(2)}</span>
+                        </p>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem('${item.name}')">
+                        <img src="./assets/images/icon-remove-item.svg" alt="remove">
+                    </button>
+                </div>
+            `).join('')}
+        </div>
+        <div class="order-total">
+            <span>Order Total</span>
+            <span class="total-amount">$${totalPrice.toFixed(2)}</span>
+        </div>
+        <div class="carbon-neutral">
+            <img src="./assets/images/icon-carbon-neutral.svg" alt="">
+            <span>This is a <b>carbon-neutral</b> delivery</span>
+        </div>
+        <button class="confirm-btn" onclick="showModal()">Confirm Order</button>
+    `;
+}
+window.showModal = () => {
+    const overlay = document.getElementById('modal-overlay');
+    const itemsList = document.getElementById('modal-items-list');
+    const totalPriceElement = document.getElementById('modal-total-price');
+    
+    const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    // Build the summary list
+    itemsList.innerHTML = cart.map(item => `
+        <div class="modal-item">
+            <div class="modal-item-left">
+                <img src="${item.image.thumbnail}" alt="${item.name}">
+                <div class="modal-item-info">
+                    <p class="name">${item.name}</p>
+                    <p>
+                        <span class="qty">${item.quantity}x</span> 
+                        <span class="price">@ $${item.price.toFixed(2)}</span>
+                    </p>
+                </div>
+            </div>
+            <p class="item-total">$${(item.quantity * item.price).toFixed(2)}</p>
+        </div>
+    `).join('');
+
+    totalPriceElement.innerText = `$${totalPrice.toFixed(2)}`;
+    overlay.classList.remove('hidden');
+    
+    // GSAP Animation for a smooth entrance
+    gsap.from(".modal-content", { y: 50, opacity: 0, duration: 0.4, ease: "power2.out" });
+};
+window.resetGame = () => {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.add('hidden');
+    cart = [];
+    renderProducts();
+    updateCartUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+initApp();
+  </script>
+</body>
+</html>
